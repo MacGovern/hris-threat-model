@@ -1,5 +1,5 @@
 Fecha: Mayo 2026
-Herramienta: ChatGPT (GPT-4o)
+Herramienta: ChatGPT (GPT-5.5)
 Propósito: Generar la descripción de arquitectura del sistema HRIS y los trust boundaries
 
 ---
