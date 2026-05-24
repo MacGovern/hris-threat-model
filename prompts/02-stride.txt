@@ -1,0 +1,49 @@
+Fecha: Mayo 2026
+Herramienta: ChatGPT (GPT-4o)
+Propósito: Generar el análisis STRIDE completo para el sistema HRIS
+
+---
+
+PROMPT UTILIZADO:
+
+Eres un experto en modelado de amenazas. Aplica la metodología STRIDE al sistema HRIS (Human Resources Information System) descrito a continuación y genera:
+
+1. Una tabla resumen de cómo aplica cada categoría STRIDE al sistema.
+
+2. Una matriz de amenazas por componente con columnas:
+   - ID (formato THxx)
+   - Componente / Flujo afectado
+   - Categoría STRIDE (S/T/R/I/D/E)
+   - Descripción de la amenaza
+   - Contramedida inicial
+
+3. Para las 6 amenazas principales, una ficha detallada con:
+   - Categoría STRIDE y componente afectado
+   - Descripción del escenario de ataque
+   - Activos afectados (usar IDs: A01=Datos PII, A02=Salarios, A03=Contratos, A04=Credenciales, A05=Evaluaciones)
+   - Probabilidad e impacto
+   - Vector de ataque paso a paso
+   - Mitigaciones propuestas (al menos 4)
+   - Técnicas MITRE ATT&CK relacionadas (con ID)
+
+DESCRIPCIÓN DEL SISTEMA:
+- Plataforma web HRIS con portal de empleados y portal de RRHH
+- Backend Java/Spring con API REST
+- Base de datos Oracle (datos sensibles: PII, salarios, contratos)
+- Integración con sistema de nómina externo via API
+- Servicio de firma digital externo
+- Módulo de autenticación con roles: Empleado (limitado), RRHH (elevado), Admin (completo)
+- Sistema de logs y auditoría básico
+- Accesible desde Internet
+
+Trust Boundaries identificados:
+- TB-1: Internet → Backend (cruce del frontend al backend)
+- TB-2: Backend → Oracle DB
+- TB-3: Backend → Servicios Externos (nómina, firma)
+- TB-4: Internet → Frontend Web
+
+Actores: Empleado, RRHH, Administrador, Atacante Externo, Proveedor Externo
+
+Enfoca el análisis en amenazas realistas para este tipo de sistema corporativo con datos sensibles de RRHH. Considera especialmente los riesgos de insider threat dado que el personal de RRHH tiene acceso elevado a datos salariales y personales de todos los empleados.
+
+Formato: Markdown con tablas y secciones claramente diferenciadas por amenaza.

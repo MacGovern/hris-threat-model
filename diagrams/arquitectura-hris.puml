@@ -1,0 +1,144 @@
+@startuml arquitectura-hris
+
+title Arquitectura HRIS — Diagrama de Trust Boundaries
+
+skinparam defaultFontName Arial
+skinparam defaultFontSize 13
+skinparam ArrowColor #555555
+skinparam ArrowThickness 1.5
+
+skinparam database {
+    BackgroundColor #FFF2CC
+    BorderColor #D6A600
+}
+skinparam component {
+    BackgroundColor #FFFFFF
+    BorderColor #888888
+}
+skinparam actor {
+    BackgroundColor #FFFFFF
+    BorderColor #444444
+}
+skinparam rectangle {
+    BorderStyle dashed
+    BorderThickness 2
+}
+skinparam collections {
+    BackgroundColor #E8F5E9
+    BorderColor #388E3C
+}
+
+left to right direction
+
+' =====================
+' ACTORES
+' =====================
+actor "Empleado" as Empleado
+actor "Personal RRHH" as RRHH
+actor "Administrador" as Admin
+actor "Atacante\nExterno" as Atacante #FFD9D9
+
+' =====================
+' ZONA PÚBLICA — Trust Boundary TB-4
+' =====================
+rectangle "Internet / Zona Pública\n[TB-4: Sin autenticación previa]" #D9EAF7 {
+
+    rectangle "Frontend Web HRIS\n[Zona DMZ]" #FFFFFF {
+        component "Portal de Empleados\n(Self-service)" as PortalEmp
+        component "Portal RRHH\n(Gestión)" as PortalRRHH
+    }
+
+}
+
+' =====================
+' RED INTERNA — Trust Boundary TB-1 y TB-2
+' =====================
+rectangle "Red Interna — Trust Boundary TB-1 / TB-2\n[Autenticación + Autorización requeridas]" #D5E8D4 {
+
+    rectangle "Backend Java / Spring Boot" #FFFFFF {
+        component "API REST\n(Punto de entrada backend)" as API
+        component "Auth & Autorización\n(JWT / Roles)" as Auth
+        component "Módulo Nómina\n(Liquidaciones)" as PayrollModule
+        component "Módulo Contratos\n(Generación / Firma)" as Contracts
+        component "Módulo Evaluaciones\n(Desempeño)" as Reviews
+        component "Módulo Onboarding\n(Empleados nuevos)" as Onboarding
+    }
+
+    database "Base de Datos Oracle\n[TB-2: Alta criticidad]" as DB
+    collections "Logs & Auditoría\n(Append-only)" as Logs
+
+}
+
+' =====================
+' SERVICIOS EXTERNOS — Trust Boundary TB-3
+' =====================
+rectangle "Servicios Externos — Trust Boundary TB-3\n[Integración API / mTLS]" #FCE5CD {
+    component "Sistema de Nómina\nExterno" as PayrollExt
+    component "Proveedor de\nFirma Digital" as Signature
+}
+
+' =====================
+' CONEXIONES — Actores → Frontend
+' =====================
+Empleado --> PortalEmp : "HTTPS\n[F01, F06]"
+RRHH --> PortalRRHH : "HTTPS\n[F02, F03, F05]"
+Admin --> PortalRRHH : "HTTPS\n[Admin]"
+Atacante ..[#FF6666]..> PortalEmp : "Intento acceso\nno autorizado"
+
+' =====================
+' CONEXIONES — Frontend → Backend
+' =====================
+PortalEmp --> API : "REST / JSON\n[TB-1]"
+PortalRRHH --> API : "REST / JSON\n[TB-1]"
+
+' =====================
+' CONEXIONES — Backend interno
+' =====================
+API --> Auth : "Validar JWT"
+API --> PayrollModule : "Solicitudes nómina"
+API --> Contracts : "Solicitudes contratos"
+API --> Reviews : "Solicitudes evaluaciones"
+API --> Onboarding : "Flujo onboarding"
+API --> DB : "JDBC / Oracle\n[F02, F04, F05, F06]"
+API --> Logs : "Registro eventos\n[F07]"
+Auth --> DB : "Consulta usuarios\n& roles"
+
+' =====================
+' CONEXIONES — Backend → Servicios externos
+' =====================
+PayrollModule --> PayrollExt : "API / mTLS\n[F04 — TB-3]"
+Contracts --> Signature : "API / mTLS\n[F03 — TB-3]"
+
+' =====================
+' NOTAS DE TRUST BOUNDARIES
+' =====================
+note top of PortalEmp
+  TB-4: Punto de entrada público.
+  Sin autenticación previa.
+  WAF + Rate Limiting recomendados.
+end note
+
+note right of DB
+  TB-2: Activo más crítico.
+  Cifrado TDE en reposo.
+  Solo accesible desde backend.
+end note
+
+note left of PayrollExt
+  TB-3: Datos salariales
+  en tránsito. TLS + validación
+  de respuesta obligatorios.
+end note
+
+' =========================================================
+' LEYENDA
+' =========================================================
+legend bottom
+|= Color |= Significado |
+|<#DCEEFF>| Zona Pública (Internet) |
+|<#DFF3E2>| Red Interna (TB1/TB-2) |
+|<#FFE8D6>| Servicios Externos (TB-3) |
+|<#FFF2CC>| Base de Datos (Crítica) |
+endlegend
+
+@enduml

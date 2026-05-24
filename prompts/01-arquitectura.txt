@@ -1,0 +1,36 @@
+Fecha: Mayo 2026
+Herramienta: ChatGPT (GPT-4o)
+Propósito: Generar la descripción de arquitectura del sistema HRIS y los trust boundaries
+
+---
+
+PROMPT UTILIZADO:
+
+Eres un experto en seguridad informática y arquitectura de software. Voy a describir un sistema HRIS (Human Resources Information System) y necesito que generes:
+
+1. Un diagrama de arquitectura en formato PlantUML que incluya:
+   - Los actores del sistema (Empleado, RRHH, Administrador, Atacante Externo)
+   - Componentes: Frontend Web, Backend Java/Spring, Base de Datos Oracle
+   - Servicios externos: Sistema de nómina externo, Proveedor de firma digital
+   - Trust Boundaries claramente marcados (zonas: Internet/Pública, Red Interna, Servicios Externos)
+   - Flujos de datos con etiquetas
+
+2. Una tabla de actores con: nombre, descripción, privilegios y nivel de confianza.
+
+3. Una descripción de cada Trust Boundary identificando:
+   - Qué cruza el límite
+   - Qué riesgos implica cruzarlo
+   - Qué controles debería tener
+
+El sistema HRIS tiene las siguientes características:
+- Plataforma web accesible desde Internet para empleados y RRHH
+- Backend desarrollado en Java con Spring Boot
+- Base de datos Oracle con datos sensibles (salarios, datos personales, contratos)
+- Integración via API con sistema de nómina externo
+- Integración con servicio de firma digital de terceros
+- Módulo de autenticación con roles (Empleado, RRHH, Administrador)
+- Sistema de logs y auditoría
+
+Contexto del análisis: Este es un trabajo académico de modelado de amenazas para la materia Ingeniería de Seguridad Informática. La empresa gestiona datos de empleados (PII), información salarial y contratos laborales.
+
+Formato de salida: Markdown con el diagrama PlantUML en bloque de código, seguido de las tablas y descripciones.

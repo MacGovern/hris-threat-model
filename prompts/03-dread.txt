@@ -1,0 +1,51 @@
+Fecha: Mayo 2026
+Herramienta: ChatGPT (GPT-4o)
+Propósito: Aplicar la metodología DREAD para priorizar las amenazas identificadas en el análisis STRIDE
+
+---
+
+PROMPT UTILIZADO:
+
+Eres un experto en análisis de riesgos de seguridad informática. A partir de las siguientes amenazas identificadas mediante STRIDE para un sistema HRIS, aplica la metodología DREAD para cuantificar y priorizar los riesgos.
+
+AMENAZAS A EVALUAR:
+- TH01: Uso de credenciales comprometidas (Spoofing) — Portal de empleados
+- TH02: Manipulación de registros salariales (Tampering) — Backend → Oracle
+- TH03: Negación de acciones realizadas (Repudiation) — Portal RRHH
+- TH04: Exposición de datos sensibles (Information Disclosure) — Oracle DB
+- TH05: Saturación de requests / DoS (Denial of Service) — API REST
+- TH06: Escalada de privilegios (Elevation of Privilege) — Backend Java
+
+METODOLOGÍA DREAD:
+Evalúa cada amenaza en una escala del 1 al 10 en cada dimensión:
+- D = Damage (daño potencial si se concreta)
+- R = Reproducibility (facilidad de reproducir el ataque)
+- E = Exploitability (facilidad de explotación)
+- A = Affected Users (cantidad de usuarios/activos afectados)
+- D = Discoverability (facilidad de descubrir la vulnerabilidad)
+
+El score total es la suma de las 5 dimensiones (rango 5-50).
+
+Escala de severidad:
+- 40-50: CRÍTICO (remediación inmediata)
+- 30-39: ALTO (prioridad alta)
+- 20-29: MEDIO (siguiente iteración)
+- 10-19: BAJO (monitorear)
+- 1-9: MÍNIMO (riesgo aceptable)
+
+CONTEXTO DEL SISTEMA:
+- Sistema HRIS accesible desde Internet sin MFA
+- Datos sensibles: PII de empleados, salarios, contratos legales
+- Roles: Empleado (básico), RRHH (acceso elevado a nómina), Admin (total)
+- Backend Java/Spring + Oracle DB + integraciones externas
+- Sin rate limiting confirmado en API
+
+ENTREGABLES REQUERIDOS:
+1. Tabla de criterios DREAD con descripción de cada dimensión
+2. Escala de puntuación utilizada
+3. Matriz completa de riesgos (una fila por amenaza, columnas D/R/E/A/D/Total/Nivel)
+4. Para las 3 amenazas de mayor score: tabla detallada con justificación por dimensión
+5. Ranking final de priorización con recomendación de acción por nivel
+6. Resumen ejecutivo (3-4 líneas) sobre qué amenazas requieren atención inmediata
+
+Formato de salida: Markdown con tablas. Usar emojis de color para niveles (🔴 CRÍTICO, 🔴 ALTO, 🟡 MEDIO, 🟢 BAJO).
