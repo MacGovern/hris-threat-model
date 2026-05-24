@@ -1,5 +1,5 @@
 Fecha: Mayo 2026
-Herramienta: ChatGPT (GPT-4o)
+Herramienta: ChatGPT (GPT-5.5)
 Propósito: Aplicar la metodología DREAD para priorizar las amenazas identificadas en el análisis STRIDE
 
 ---
