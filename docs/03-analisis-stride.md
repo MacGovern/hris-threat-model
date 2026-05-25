@@ -48,6 +48,8 @@ STRIDE es una metodología de análisis de amenazas desarrollada por Microsoft q
 | TH08  | Backend → Sistema Nómina ext.| T      | Manipulación de datos en tránsito        | TLS + validación de respuesta|
 | TH09  | Módulo de firma digital      | R      | Firma de contrato sin consentimiento     | Confirmación explícita      |
 | TH10  | API REST                     | I      | Fuga de datos en respuestas de API       | Filtrado de campos sensibles|
+| TH11  | API REST / Infraestructura   | D      | Consumo de recursos por queries costosas | Timeout + paginación forzada|
+| TH12  | Portal Empleados             | E      | Manipulación de parámetros de sesión     | Validación servidor + tokens|
 
 ---
 
@@ -220,6 +222,176 @@ Un usuario obtiene permisos superiores a los autorizados debido a errores de con
 
 ---
 
+### AMENAZA TH07 — Suplantación de identidad de gestor RRHH
+
+**Categoría STRIDE:** Spoofing  
+**Componente afectado:** Portal RRHH → Backend API
+
+**Descripción:**  
+Un atacante obtiene acceso a la cuenta de un usuario del área de RRHH —que tiene permisos elevados sobre nóminas, contratos y datos de todos los empleados— y opera bajo esa identidad. A diferencia de TH01 (empleado estándar), el impacto es significativamente mayor porque el rol de RRHH habilita modificaciones masivas. El vector puede ser phishing dirigido (spear phishing) al personal de RRHH, o reutilización de credenciales filtradas en otras plataformas.
+
+**Activos afectados:** A01, A02, A03, A04
+
+**Probabilidad:** Media  
+**Impacto:** Alto
+
+**Vector de ataque típico:**
+1. Atacante identifica al personal de RRHH mediante LinkedIn u otras fuentes públicas
+2. Realiza spear phishing personalizado con pretexto laboral (ej.: "adjunto liquidación de nómina")
+3. Obtiene credenciales del gestor de RRHH
+4. Accede al portal con permisos elevados; descarga nóminas completas, modifica beneficios o genera contratos falsos
+
+**Mitigaciones propuestas:**
+- MFA obligatorio con prioridad para roles RRHH y Admin
+- Alertas ante login desde dispositivo o IP no reconocidos
+- Sesiones con timeout agresivo para roles privilegiados
+- Capacitación específica en spear phishing para personal de RRHH
+
+**Técnicas ATT&CK relacionadas:** T1566 (Phishing), T1078 (Valid Accounts)
+
+---
+
+### AMENAZA TH08 — Manipulación de datos en tránsito hacia sistema de nómina externo
+
+**Categoría STRIDE:** Tampering  
+**Componente afectado:** Backend → Sistema de Nómina Externo (TB-3)
+
+**Descripción:**  
+El flujo de datos entre el backend interno y el sistema de nómina externo cruza un trust boundary (TB-3). Si esta integración no está protegida con cifrado y autenticación mutua, un actor con posición de red privilegiada (man-in-the-middle) o un proveedor comprometido podría interceptar y modificar los datos salariales en tránsito antes de que sean procesados por el sistema externo. También aplica a la alteración de respuestas del sistema externo hacia el backend.
+
+**Activos afectados:** A02, T04
+
+**Probabilidad:** Baja  
+**Impacto:** Alto
+
+**Vector de ataque típico:**
+1. Atacante con acceso a la red perimetral intercepta el canal entre backend y sistema nómina
+2. Modifica montos salariales, cuentas bancarias de destino o datos de empleados en los paquetes
+3. El sistema de nómina externo procesa los datos alterados como si fueran legítimos
+4. Transferencias salariales incorrectas o fraudulentas se ejecutan antes de detectarse
+
+**Mitigaciones propuestas:**
+- TLS 1.2+ obligatorio en todas las comunicaciones con servicios externos
+- Autenticación mutua (mTLS) o API keys con firma HMAC para cada request
+- Validación de esquema e integridad de las respuestas recibidas del proveedor
+- Registro y alerta ante respuestas inesperadas o fuera de rango
+
+**Técnicas ATT&CK relacionadas:** T1557 (Adversary-in-the-Middle), T1565 (Data Manipulation)
+
+---
+
+### AMENAZA TH09 — Firma de contrato sin consentimiento real del empleado
+
+**Categoría STRIDE:** Repudiation  
+**Componente afectado:** Módulo de Contratos → Proveedor de Firma Digital (TB-3)
+
+**Descripción:**  
+Un administrador o usuario de RRHH con acceso al módulo de contratos podría iniciar y completar el proceso de firma digital de un contrato utilizando la cuenta de un empleado sin su participación real. Si el flujo de firma no requiere confirmación activa del empleado (ej.: un OTP enviado a su dispositivo personal), el proceso queda vulnerable a abuso interno. El empleado podría luego negar haber firmado, y sin evidencia forense sólida del consentimiento, el contrato podría ser impugnable.
+
+**Activos afectados:** A03, T05
+
+**Probabilidad:** Baja  
+**Impacto:** Alto
+
+**Mitigaciones propuestas:**
+- Requerir confirmación activa del empleado mediante canal independiente (email/SMS/app)
+- Registro de IP, dispositivo, timestamp y geolocalización en el momento de la firma
+- Envío de copia del contrato firmado al correo personal del empleado inmediatamente
+- Logs inmutables del flujo de firma con hash del documento
+
+**Técnicas ATT&CK relacionadas:** T1098 (Account Manipulation), T1070 (Indicator Removal on Host)
+
+---
+
+### AMENAZA TH10 — Fuga de datos sensibles en respuestas de API
+
+**Categoría STRIDE:** Information Disclosure  
+**Componente afectado:** API REST
+
+**Descripción:**  
+Los endpoints REST del backend pueden retornar más información de la necesaria para la operación solicitada. Este patrón —conocido como "over-fetching" o exposición excesiva de datos— es frecuente en APIs construidas sin considerar el principio de mínima exposición. Por ejemplo, un endpoint de consulta de perfil podría devolver el hash de la contraseña, el salario o datos de otros empleados referenciados. Adicionalmente, mensajes de error descriptivos pueden revelar estructuras internas de la base de datos o lógica de negocio.
+
+**Activos afectados:** A01, A02, A04
+
+**Probabilidad:** Media  
+**Impacto:** Medio/Alto
+
+**Vector de ataque típico:**
+1. Atacante autenticado (empleado) consulta su propio perfil vía API
+2. Observa en la respuesta JSON campos adicionales: hash de contraseña, saldo de beneficios, referencias a otros usuarios
+3. Manipula el ID del request (IDOR) para consultar perfiles de otros empleados
+4. Obtiene datos de colegas sin autorización
+
+**Mitigaciones propuestas:**
+- Implementar serialización selectiva (DTOs específicos por endpoint)
+- Validar ownership del recurso solicitado antes de retornar datos
+- Nunca exponer hashes de contraseñas, tokens internos ni campos técnicos en respuestas
+- Mensajes de error genéricos en producción (sin stack traces ni nombres de tablas)
+
+**Técnicas ATT&CK relacionadas:** T1213 (Data from Information Repositories), T1190 (Exploit Public-Facing Application)
+
+---
+
+### AMENAZA TH11 — Consumo de recursos por consultas costosas (DoS lógico)
+
+**Categoría STRIDE:** Denial of Service  
+**Componente afectado:** API REST / Base de Datos Oracle
+
+**Descripción:**  
+A diferencia de un ataque DoS volumétrico (TH05), esta amenaza implica que un usuario autenticado —o un atacante con acceso mínimo— explota endpoints de la API que realizan consultas costosas en base de datos (sin paginación, sin límite de resultados, con joins complejos) para agotar recursos del servidor de forma deliberada con pocas peticiones. En sistemas HRIS con tablas de miles de empleados y años de historial de nómina, una consulta de "todos los registros" puede saturar Oracle y afectar a todos los usuarios.
+
+**Activos afectados:** T02, T03, T01
+
+**Probabilidad:** Media  
+**Impacto:** Medio
+
+**Vector de ataque típico:**
+1. Atacante autenticado identifica un endpoint de reportes de nómina sin paginación
+2. Lanza múltiples requests simultáneos de exportación masiva
+3. Oracle recibe queries sin límite; CPU y memoria se saturan
+4. El portal se vuelve inoperable para el resto de los usuarios durante horas críticas (ej.: cierre de nómina)
+
+**Mitigaciones propuestas:**
+- Paginación obligatoria en todos los endpoints de listado (máx. 100 registros por request)
+- Timeout de consulta configurado en el pool de conexiones JDBC
+- Límite de requests concurrentes por usuario autenticado
+- Caché de resultados para reportes frecuentes
+- Monitoreo de consultas lentas en Oracle (AWR/ADDM)
+
+**Técnicas ATT&CK relacionadas:** T1499 (Endpoint Denial of Service), T1078 (Valid Accounts)
+
+---
+
+### AMENAZA TH12 — Manipulación de parámetros de sesión para acceso no autorizado
+
+**Categoría STRIDE:** Elevation of Privilege  
+**Componente afectado:** Portal de Empleados / Gestión de Sesiones
+
+**Descripción:**  
+Un usuario autenticado modifica parámetros de sesión, cookies o tokens JWT para intentar elevar sus privilegios o acceder a recursos de otros usuarios. Esto puede ocurrir cuando el backend confía en información embebida en el token del cliente sin validarla contra la base de datos en cada request, o cuando los tokens tienen vida útil excesivamente larga. También aplica a la manipulación del campo de rol dentro de un JWT mal configurado (sin firma robusta o con algoritmo "none").
+
+**Activos afectados:** T01, T02, A04
+
+**Probabilidad:** Media  
+**Impacto:** Alto
+
+**Vector de ataque típico:**
+1. Empleado autenticado decodifica su JWT (base64) y observa el campo `"role": "employee"`
+2. Intenta modificar el token a `"role": "admin"` y re-enviarlo
+3. Si el backend no valida la firma del JWT correctamente, acepta el token modificado
+4. El empleado accede a funcionalidades administrativas sin autorización
+
+**Mitigaciones propuestas:**
+- Firma JWT con algoritmo robusto (RS256 o ES256; nunca algoritmo "none")
+- Validar firma del JWT en cada request en el servidor; nunca confiar en el payload sin verificar
+- Vencimiento de tokens corto (15–60 minutos) con refresh token seguro
+- Validar rol contra base de datos en operaciones sensibles (no solo contra el token)
+- Revocar sesiones activas ante cambios de rol o contraseña
+
+**Técnicas ATT&CK relacionadas:** T1068 (Exploitation for Privilege Escalation), T1552 (Unsecured Credentials)
+
+---
+
 ## 4.5 Resumen de la Matriz STRIDE
 
 | Categoría STRIDE       | Amenazas identificadas           | Nivel de riesgo predominante |
@@ -228,5 +400,5 @@ Un usuario obtiene permisos superiores a los autorizados debido a errores de con
 | Tampering              | TH02, TH08                       | Alto                         |
 | Repudiation            | TH03, TH09                       | Medio                        |
 | Information Disclosure | TH04, TH10                       | Alto                         |
-| Denial of Service      | TH05                             | Medio / Alto                 |
-| Elevation of Privilege | TH06                             | Alto                         |
+| Denial of Service      | TH05, TH11                       | Medio / Alto                 |
+| Elevation of Privilege | TH06, TH12                       | Alto                         |
