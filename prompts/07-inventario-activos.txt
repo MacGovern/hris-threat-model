@@ -1,0 +1,55 @@
+Fecha: Mayo 2026
+Herramienta: ChatGPT (GPT-5.5)
+Propósito: Identificar y clasificar los activos del sistema HRIS para el análisis de riesgos
+
+---
+
+PROMPT UTILIZADO:
+
+Eres un consultor de seguridad de la información especializado en sistemas de RRHH. Voy a describir un sistema HRIS y necesito que generes un inventario completo de activos para el análisis de riesgos.
+
+DESCRIPCIÓN DEL SISTEMA:
+Plataforma de gestión de recursos humanos para una empresa de tamaño mediano (~500 empleados). Funcionalidades:
+- Nóminas y liquidaciones salariales mensuales
+- Gestión de beneficios (cobertura médica, seguro, vacaciones)
+- Evaluaciones de desempeño
+- Portal de autoservicio para empleados
+- Onboarding digital (contratos, documentación)
+- Generación y firma digital de contratos laborales
+
+Stack tecnológico:
+- Frontend: aplicación web (navegador)
+- Backend: Java con Spring Boot
+- Base de datos: Oracle Database
+- Integración: sistema de nómina externo via API REST
+- Firma digital: proveedor externo via API
+- Autenticación: usuario + contraseña, JWT, roles (Empleado / RRHH / Admin)
+
+ENTREGABLES REQUERIDOS:
+
+1. Tabla de activos de información con columnas:
+   - ID (A01, A02, ...)
+   - Nombre del activo
+   - Tipo de dato (PII, Financiero, Legal, Autenticación, Confidencial)
+   - Clasificación de confidencialidad (Alta / Media / Baja)
+   - Propietario (quién es responsable de ese activo)
+   - Breve descripción de por qué es crítico
+
+2. Tabla de activos tecnológicos con columnas:
+   - ID (T01, T02, ...)
+   - Nombre del componente
+   - Tipo (Software / Base de datos / Servicio externo / Infraestructura)
+   - Criticidad (Crítica / Alta / Media / Baja)
+   - Notas relevantes para el análisis de seguridad
+
+3. Lista de activos intangibles con descripción de impacto si se ven comprometidos.
+
+4. Una breve descripción del alcance del análisis:
+   - Qué componentes están dentro del alcance
+   - Qué componentes están fuera del alcance y por qué
+
+5. Supuestos del análisis (estado inicial del sistema, sin controles avanzados implementados).
+
+Sé específico sobre qué tipo de datos maneja cada activo y cuál sería el impacto concreto si se compromete (ej: "exposición de salarios de todos los empleados", "firma fraudulenta de contratos"). Esto se usará como base para el análisis STRIDE.
+
+Formato: Markdown con tablas y secciones numeradas.

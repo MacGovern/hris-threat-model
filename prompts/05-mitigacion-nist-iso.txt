@@ -1,0 +1,40 @@
+Fecha: Mayo 2026
+Herramienta: ChatGPT (GPT-5.5)
+Propósito: Generar el plan de mitigación priorizado y mapear controles a NIST SP 800-53 e ISO 27001
+
+---
+
+PROMPT UTILIZADO:
+
+Eres un experto en seguridad de la información especializado en marcos normativos (NIST, ISO 27001). Dado el siguiente análisis de amenazas de un sistema HRIS, necesito dos entregables:
+
+ENTREGABLE 1 — PLAN DE MITIGACIÓN PRIORIZADO:
+
+Para las siguientes amenazas identificadas (ordenadas por score DREAD descendente), genera un plan de mitigación con:
+
+- ID de control (formato Cxx)
+- Amenaza o amenazas que mitiga
+- Descripción del control (qué implementar exactamente, no solo el nombre)
+- Tipo: Preventivo / Detectivo / Correctivo
+- Prioridad: Alta / Media / Baja
+- Fase de implementación sugerida:
+  * Fase 1: 0–30 días (acciones inmediatas, sin rediseño)
+  * Fase 2: 30–90 días (mejoras con algo de esfuerzo)
+  * Fase 3: 90–180 días (cambios estructurales, capacitación, procesos)
+
+Amenazas (ordenadas por urgencia):
+TH01 CRÍTICO, TH04 ALTO, TH06 ALTO, TH02 ALTO, TH05 ALTO, TH07 ALTO, TH12 ALTO, TH10 ALTO, TH08 ALTO, TH11 MEDIO, TH03 MEDIO, TH09 MEDIO
+
+Stack tecnológico: Java Spring Boot + Oracle DB + frontend web + integraciones REST externas
+
+ENTREGABLE 2 — MAPEO A NIST SP 800-53 e ISO 27001:
+
+Para cada control propuesto, mapea a:
+- Control NIST SP 800-53 Rev. 5 (ej: AC-2, IA-2, AU-6) con descripción breve
+- Control ISO/IEC 27001:2022 Anexo A correspondiente (ej: A.8.5, A.5.15)
+
+Adicionalmente genera:
+- Una tabla de "Gap Analysis" identificando qué controles normativos no están implementados actualmente en el sistema (asumiendo estado inicial sin MFA, sin cifrado en reposo documentado, sin SIEM y con RBAC no revisado)
+- Una tabla de cobertura por área de control: Autenticación, Autorización, Protección de datos, Logging, Continuidad, Gestión de incidentes
+
+Formato: Markdown con tablas. Sé específico en las descripciones de controles; evita generalidades como "implementar seguridad". Incluye notas técnicas para el stack Java/Oracle cuando sea relevante (ej: "Spring Security MFA con TOTP vía Google Authenticator", "Oracle TDE para cifrado de columnas sensibles").

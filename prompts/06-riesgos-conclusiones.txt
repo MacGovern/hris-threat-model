@@ -1,0 +1,49 @@
+Fecha: Mayo 2026
+Herramienta: Claude (Anthropic — claude-sonnet-4)
+Propósito: Generar el análisis de riesgos residuales y las conclusiones finales del proyecto
+
+---
+
+PROMPT UTILIZADO:
+
+Contexto: Estoy finalizando el análisis de riesgos y modelado de amenazas para un sistema HRIS (Recursos Humanos) como trabajo académico de Introducción a la Seguridad Informática. Ya tenemos:
+- 12 amenazas identificadas con STRIDE (TH01–TH12)
+- Priorización con DREAD (1 CRÍTICA, 9 ALTAS, 3 MEDIAS)
+- 15 controles de mitigación propuestos (C01–C15) organizados en 3 fases
+
+Ahora necesito dos secciones finales del documento:
+
+SECCIÓN 1 — RIESGOS RESIDUALES:
+
+Luego de aplicar los controles de mitigación propuestos, identifica los riesgos que persisten. Para cada riesgo residual:
+- ID (R01, R02, ...)
+- Descripción del riesgo residual (distinto de la amenaza original; enfocado en lo que queda después de los controles)
+- Amenaza origen
+- Probabilidad post-mitigación (Alta / Media / Baja / Muy baja)
+- Impacto
+- Nivel residual
+- Justificación: por qué el control no elimina completamente el riesgo
+
+Considera especialmente:
+- El factor humano (phishing de MFA, ingeniería social avanzada)
+- Insider threats con acceso legítimo
+- Errores de configuración en actualizaciones futuras
+- Dependencia de proveedores externos (nómina, firma digital)
+- Ventanas de tiempo entre detección y respuesta a incidentes
+
+Incluye también:
+- Una tabla comparativa de nivel de riesgo ANTES y DESPUÉS de los controles
+- Los riesgos que la organización debe aceptar formalmente (con condiciones de aceptación)
+- Un plan de monitoreo continuo de riesgos residuales (frecuencia por actividad)
+
+SECCIÓN 2 — CONCLUSIONES Y RECOMENDACIONES:
+
+Redacta las conclusiones finales del análisis con:
+- Resumen ejecutivo (orientado a una audiencia no técnica: gerencia, RRHH)
+- Los 3–5 hallazgos más importantes del análisis
+- Lista priorizada de recomendaciones con plazo sugerido
+- Próximos pasos en forma de tabla (acción, responsable, plazo)
+- Limitaciones del análisis (qué no se cubrió, qué requiere validación técnica adicional)
+- Una conclusión final de 2–3 párrafos que sintetice el estado de riesgo del sistema
+
+Tono: técnico pero accesible. El documento será presentado al docente y a una audiencia mixta (técnica y no técnica). Formato: Markdown.

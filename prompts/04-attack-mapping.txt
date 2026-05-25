@@ -1,0 +1,43 @@
+Fecha: Mayo 2026
+Herramienta: ChatGPT (GPT-5.5)
+Propósito: Mapear las amenazas del HRIS a técnicas MITRE ATT&CK y construir kill chains realistas
+
+---
+
+PROMPT UTILIZADO:
+
+Eres un analista de threat intelligence especializado en MITRE ATT&CK. Para cada amenaza del sistema HRIS que te voy a listar, necesito que hagas lo siguiente:
+
+1. Identifica las técnicas ATT&CK más relevantes (con ID, nombre y táctica) para cada amenaza. Prioriza técnicas documentadas en ataques reales a sistemas corporativos con datos de RRHH o financieros.
+
+2. Para las 3 cadenas de ataque más probables, construye un kill chain completo mostrando:
+   - Progresión táctica paso a paso (en formato diagrama de texto)
+   - Qué amenazas STRIDE se activan en cada etapa
+   - Qué datos o sistemas quedan comprometidos en cada paso
+
+3. Una tabla de relación amenaza ↔ técnicas ATT&CK.
+
+4. Una tabla de mitigaciones específicas por técnica ATT&CK (columnas: ID técnica, mitigación recomendada).
+
+AMENAZAS DEL SISTEMA HRIS:
+- TH01: Credenciales comprometidas (S) — Portal empleados
+- TH02: Manipulación de nómina (T) — Backend → Oracle
+- TH03: Negación de acciones (R) — Logs / Auditoría
+- TH04: Exposición de datos sensibles (I) — Oracle DB / API
+- TH05: DoS volumétrico (D) — API REST
+- TH06: Escalada de privilegios (E) — Backend Java
+- TH07: Suplantación gestor RRHH (S) — Portal RRHH
+- TH08: Manipulación datos en tránsito (T) — Integración nómina externa
+- TH09: Firma sin consentimiento (R) — Módulo firma digital
+- TH10: Fuga de datos en API (I) — Endpoints REST
+- TH11: DoS lógico por consultas costosas (D) — API / Oracle
+- TH12: Manipulación de sesión JWT (E) — Portal empleados
+
+CONTEXTO TÉCNICO:
+- Backend: Java / Spring Boot con Spring Security
+- Base de datos: Oracle (JDBC)
+- Autenticación: JWT + usuario/contraseña (sin MFA actualmente)
+- Integraciones externas: sistema de nómina + proveedor de firma digital via HTTPS/REST
+- Roles: Empleado, RRHH, Administrador
+
+Usa el framework ATT&CK Enterprise (no ICS). Referencia técnicas con su ID completo (ej: T1078.001 si aplica subtécnica). El output debe ser Markdown con tablas y los kill chains en bloques de texto ASCII.

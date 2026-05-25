@@ -1,0 +1,47 @@
+Fecha: Mayo 2026
+Herramienta: Claude (Anthropic — claude-sonnet-4)
+Propósito: Revisión de coherencia, ampliación de amenazas faltantes y organización del repositorio Git completo
+
+---
+
+PROMPT UTILIZADO:
+
+Tengo un repositorio Git de análisis de riesgos para un sistema HRIS generado parcialmente con ChatGPT. El trabajo es para la materia Introducción a la Seguridad Informática (ISI) y debe presentarse el 26 de mayo de 2026.
+
+El repositorio tiene la siguiente estructura requerida por la cátedra:
+[estructura pegada del enunciado]
+
+Tengo ya generados con ChatGPT los siguientes archivos:
+- docs/01-inventario-activos.md (activos A01–A05, T01–T05)
+- docs/03-analisis-stride.md (amenazas TH01–TH06, solo 6 amenazas, solo 1 por letra STRIDE)
+- docs/04-priorizacion-dread.md (matriz DREAD para TH01–TH06 con análisis detallado de las 5 primeras)
+- Un diagrama PlantUML básico
+- Referencias
+
+Necesito que hagas lo siguiente:
+
+1. REVISIÓN DE COHERENCIA: Revisa que los IDs de activos, amenazas y controles sean consistentes entre todos los documentos.
+
+2. AMPLIACIÓN DEL ANÁLISIS STRIDE: El análisis actual solo tiene 1 amenaza por letra STRIDE (S, T, R, I, D, E). La cátedra espera al menos 2 por letra. Agrega:
+   - TH07: segunda amenaza S (Spoofing) — suplantación de gestor RRHH via spear phishing
+   - TH08: segunda amenaza T (Tampering) — manipulación de datos en tránsito hacia sistema nómina externo
+   - TH09: segunda amenaza R (Repudiation) — firma de contrato sin consentimiento real
+   - TH10: segunda amenaza I (Information Disclosure) — fuga de datos en respuestas de API (IDOR)
+   - TH11: segunda amenaza D (Denial of Service) — DoS lógico por consultas costosas sin paginación
+   - TH12: segunda amenaza E (Elevation of Privilege) — manipulación de parámetros JWT para escalada de sesión
+
+   Para cada una: descripción, activos afectados, probabilidad, impacto, vector de ataque paso a paso, mitigaciones, técnicas ATT&CK.
+
+3. AMPLIACIÓN DEL DREAD: Agrega filas para TH07–TH12 en la matriz DREAD con justificación por dimensión. Actualiza el ranking final y amplía el resumen ejecutivo para cubrir el perfil completo de 12 amenazas.
+
+4. DOCUMENTOS FALTANTES: Genera los archivos que faltan:
+   - docs/02-arquitectura-trust-boundaries.md
+   - docs/05-mapa-attack.md (con kill chains)
+   - docs/06-plan-mitigacion.md (15 controles en 3 fases)
+   - docs/07-controles-nist-iso.md (con gap analysis)
+   - docs/08-riesgos-residuales.md (post-mitigación)
+   - docs/09-conclusiones.md
+
+5. README.md: Genera un README profesional con descripción del proyecto, checklist de entregables, herramientas de IA utilizadas, estructura del repositorio y referencias rápidas.
+
+El repositorio es público y será evaluado por el docente. Mantén consistencia en IDs, tablas y referencias cruzadas entre archivos.
